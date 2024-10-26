@@ -1,0 +1,101 @@
+When designing a database schema for a full-stack e-commerce application, you should carefully consider the collections needed to support various features such as product management, user authentication, order processing, and more. Here’s a suggested list of collections along with brief descriptions for each, aimed at building a comprehensive and advanced e-commerce application:
+
+Suggested Database Collections
+Users (users)
+
+Purpose: Store user information, including authentication details, roles, and personal information.
+Key Fields:
+firstName
+lastName
+email
+password
+role (e.g., admin, client)
+address
+isVerified
+verificationToken
+createdAt
+updatedAt
+Products (products)
+
+Purpose: Store product information including details for display on the e-commerce platform.
+Key Fields:
+name
+description
+price
+categoryId (reference to categories)
+images (array of image URLs)
+stockQuantity
+rating
+createdAt
+updatedAt
+Categories (categories)
+
+Purpose: Organize products into categories for easier navigation.
+Key Fields:
+name
+description
+parentId (for nested categories)
+createdAt
+updatedAt
+Orders (orders)
+
+Purpose: Track user orders and their statuses.
+Key Fields:
+userId (reference to users)
+products (array of product IDs and quantities)
+totalAmount
+status (e.g., pending, shipped, delivered)
+shippingAddress
+createdAt
+updatedAt
+Order Items (order_items)
+
+Purpose: Store details of each product within an order.
+Key Fields:
+orderId (reference to orders)
+productId (reference to products)
+quantity
+price
+Cart (carts)
+
+Purpose: Temporary storage for items that users intend to purchase.
+Key Fields:
+userId (reference to users)
+items (array of product IDs and quantities)
+createdAt
+updatedAt
+Reviews (reviews)
+
+Purpose: Store product reviews submitted by users.
+Key Fields:
+productId (reference to products)
+userId (reference to users)
+rating
+comment
+createdAt
+Payments (payments)
+
+Purpose: Track payment transactions related to orders.
+Key Fields:
+orderId (reference to orders)
+amount
+paymentMethod (e.g., credit card, PayPal)
+status (e.g., successful, failed)
+createdAt
+Wishlists (wishlists)
+
+Purpose: Allow users to save products they are interested in.
+Key Fields:
+userId (reference to users)
+products (array of product IDs)
+createdAt
+updatedAt
+Discounts/Coupons (coupons)
+
+Purpose: Manage promotional discounts and coupon codes.
+Key Fields:
+code
+discountType (e.g., percentage, fixed amount)
+amount
+expiryDate
+usageCount
