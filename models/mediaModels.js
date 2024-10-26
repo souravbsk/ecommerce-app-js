@@ -21,7 +21,7 @@ const mediaSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", // Reference to the user who uploaded
-    required: true,
+    // required: true,
   },
   metadata: {
     title: { type: String }, // Title of the media file

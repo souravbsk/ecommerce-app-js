@@ -2,9 +2,12 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const { mediaRoutes } = require("./routes/v1/media.routes");
+const setupSwagger = require("./swagger");
 require("dotenv").config(); // Load environment variables from .env file
-
 const app = express();
+const path = require('path')
+
 
 // Middleware
 app.use(cors()); // Enable CORS
@@ -13,6 +16,16 @@ app.use(express.json()); // For parsing application/json
 // Connect to MongoDB
 connectDB();
 // Use the user routes
+
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+
+setupSwagger(app);
+app.use("/api/v1/media", mediaRoutes);
+
+// Set up Swagger
 
 // Health check route
 app.get("/test", (req, res) => {

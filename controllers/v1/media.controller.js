@@ -1,14 +1,14 @@
-const Media = require("../models/mediaModel.js");
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
+const Media = require("../../models/mediaModels");
 // const { uploadToCloud } = require("../utils/cloudStorage.js"); // Hypothetical utility for cloud storage
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const year = new Date().getFullYear();
-    const dir = path.join(__dirname, "../uploads", year.toString());
+    const dir = path.join(__dirname, "../.././uploads", year.toString());
     fs.mkdirSync(dir, { recursive: true }); // Create year-based folder if it doesn't exist
     cb(null, dir);
   },
@@ -18,35 +18,54 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-// Upload media file
+// 10 is the max number of files to upload
+// Upload media file(s)
+// Unified upload media function
 const uploadMedia = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded." });
+    // Check if files are present in req.files
+    const files = req.files || []; // Use req.files if present (multiple), or an empty array
+
+    // Check if a single file was uploaded
+    if (req.file) {
+      files.push(req.file); // If a single file was uploaded, push it into the files array
     }
 
-    const { filename, path: filePath } = req.file;
-    const year = new Date().getFullYear();
-    const type = determineFileType(filePath); // Custom function to determine file type
+    if (files.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No files uploaded." });
+    }
 
-    const newMedia = new Media({
-      filename,
-      path: filePath,
-      type,
-      year,
-      user: req.user._id, // Assuming user is authenticated and available in req.user
-      metadata: {
-        title: req.body.title || filename,
-        description: req.body.description || "",
-        size: fs.statSync(filePath).size,
-        format: path.extname(filePath).substring(1),
-        // Additional metadata fields can be populated here if needed
-      },
-    });
+    const mediaRecords = []; // To store created media records
 
-    await newMedia.save();
-    res.status(201).json({ success: true, media: newMedia });
+    for (const file of files) {
+      const { filename } = file;
+      const year = new Date().getFullYear();
+      const type = determineFileType(file.path); // Use the original file path to determine type
+
+      // Use forward slashes in the relative path
+      const relativePath = `uploads/${year}/${filename}`; // Generates 'uploads/2024/filename'
+
+      const newMedia = new Media({
+        filename,
+        path: relativePath, // Store relative path here
+        type,
+        year,
+        // user: req.user._id, // Assuming user is authenticated and available in req.user
+        metadata: {
+          title: req.body.title || filename,
+          description: req.body.description || "",
+          size: fs.statSync(file.path).size,
+          format: path.extname(file.path).substring(1),
+        },
+      });
+
+      await newMedia.save();
+      mediaRecords.push(newMedia);
+    }
+
+    res.status(201).json({ success: true, media: mediaRecords });
   } catch (error) {
     console.error("Error uploading media:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
@@ -54,10 +73,34 @@ const uploadMedia = async (req, res) => {
 };
 
 // Get all media files
+// Get all media files with pagination
 const getAllMedia = async (req, res) => {
   try {
-    const mediaFiles = await Media.find().populate("user", "displayName"); // Populate user info if needed
-    res.status(200).json({ success: true, media: mediaFiles });
+    // Get page and limit from query parameters, with defaults if not provided
+    const page = parseInt(req.query.page) || 1; // Default page is 1
+    const limit = parseInt(req.query.limit) || 10; // Default limit is 10 items per page
+    const skip = (page - 1) * limit;
+
+    // Find media files with pagination
+    const mediaFiles = await Media.find()
+      .skip(skip)
+      .limit(limit)
+      .populate("user", "displayName"); // Populate user info if needed
+
+    // Get total number of media files for calculating the total number of pages
+    const totalMediaFiles = await Media.countDocuments();
+    const totalPages = Math.ceil(totalMediaFiles / limit);
+
+    res.status(200).json({
+      success: true,
+      media: mediaFiles,
+      pagination: {
+        totalItems: totalMediaFiles,
+        currentPage: page,
+        totalPages: totalPages,
+        itemsPerPage: limit,
+      },
+    });
   } catch (error) {
     console.error("Error fetching media files:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
@@ -69,7 +112,9 @@ const getMediaById = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
     if (!media) {
-      return res.status(404).json({ success: false, message: "Media not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Media not found." });
     }
     res.status(200).json({ success: true, media });
   } catch (error) {
@@ -81,9 +126,13 @@ const getMediaById = async (req, res) => {
 // Update media metadata
 const updateMedia = async (req, res) => {
   try {
+
+    console.log(req.body)
     const media = await Media.findById(req.params.id);
     if (!media) {
-      return res.status(404).json({ success: false, message: "Media not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Media not found." });
     }
 
     const { title, description } = req.body;
@@ -91,6 +140,7 @@ const updateMedia = async (req, res) => {
     media.metadata.description = description || media.metadata.description;
 
     await media.save();
+    console.log(media)
     res.status(200).json({ success: true, media });
   } catch (error) {
     console.error("Error updating media:", error);
@@ -103,14 +153,18 @@ const deleteMedia = async (req, res) => {
   try {
     const media = await Media.findById(req.params.id);
     if (!media) {
-      return res.status(404).json({ success: false, message: "Media not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Media not found." });
     }
 
     // Optionally delete file from storage
     fs.unlinkSync(media.path); // Ensure proper error handling for file deletion
 
     await Media.findByIdAndDelete(req.params.id);
-    res.status(200).json({ success: true, message: "Media deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Media deleted successfully." });
   } catch (error) {
     console.error("Error deleting media:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
