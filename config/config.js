@@ -18,6 +18,14 @@ const config = {
     paymentGatewayApiKey: process.env.PAYMENT_GATEWAY_API_KEY,
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     BASE_URL: process.env.BASE_URL || "http://localhost:5000",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    CALLBACK_URL: process.env.CALLBACK_URL,
+    ACCESS_TOKEN_SECRET:
+      process.env.ACCESS_TOKEN_SECRET || "dev_access_token_secret",
+    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN || "localhost",
+    NODE_ENV: process.env.NODE_ENV || "development",
+    DOMAIN: process.env.DOMAIN,
   },
   production: {
     port: process.env.PORT || 80,
@@ -31,6 +39,13 @@ const config = {
     paymentGatewayApiKey: process.env.PAYMENT_GATEWAY_API_KEY,
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     BASE_URL: process.env.BASE_URL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    CALLBACK_URL: process.env.CALLBACK_URL,
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
+    NODE_ENV: process.env.NODE_ENV,
+    DOMAIN: process.env.DOMAIN,
   },
 };
 

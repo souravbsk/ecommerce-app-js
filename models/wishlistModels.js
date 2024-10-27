@@ -61,6 +61,8 @@ const wishlistSchema = new Schema(
 const Wishlist = model("Wishlist", wishlistSchema);
 export default Wishlist;
 
+
+
 // {
 //     "_id": "64d92e9a3dbb4c002b945b6b",
 //     "user": "64b92e9a3dbb4c002b945b1d",
