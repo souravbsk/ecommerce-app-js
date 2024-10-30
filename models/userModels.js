@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const userSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+    },
     firstName: {
       type: String,
       required: true,
@@ -60,15 +63,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8, // Minimum length set to 8
       trim: true,
-      validate: {
-        validator: (value) => {
-          const passwordRegex =
-            /^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-          return passwordRegex.test(value); // Returns true if password is valid
-        },
-        message: () =>
-          "Password must be at least 8 characters long, contain at least one lowercase letter, one number, and one special character.",
-      },
+      // validate: {
+      //   validator: (value) => {
+      //     const passwordRegex =
+      //       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[A-Za-z\d]{8,}$/;
+      //     return passwordRegex.test(value); // Returns true if password is valid
+      //   },
+      //   message: () =>
+      //     "Password must be at least 8 characters long, contain at least one lowercase letter, one number, and one special character.",
+      // },
     },
 
     phone: {

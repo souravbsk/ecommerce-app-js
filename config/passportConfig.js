@@ -18,33 +18,44 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, done) {
       try {
-        let user = await User.findOne({
-          email: profile?.emails[0]?.value,
-        });
-
+        const email = profile?.emails[0]?.value;
+        let user = await User.findOne({ email });
+        
         if (!user) {
-          // If user does not exist, create a new user
-          const username = await profile?.emails[0]?.value?.split("@")[0];
-          const newUser = new users({
+          // Generate a hashed password concurrently
+          const [hashedPassword, username] = await Promise.all([
+            bcrypt.hash(email, 10),
+            email.split("@")[0]
+          ]);
+
+          // Create and save new user
+          user = new User({
+            googleId: profile.id,
+            firstName: profile.name.familyName,
+            lastName: profile.name.givenName,
+            password: hashedPassword,
+            username: username,
+            email: email,
+            isEmailVerified: profile?.emails[0]?.verified,
+            avatar: profile?.photos[0]?.value,
+          });
+          await user.save();
+        } else {
+          // Update existing user details if necessary
+          const updates = {
             googleId: profile.id,
             displayName: profile.displayName,
-            username: username,
-            email: profile?.emails[0]?.value,
-            isEmailVerify: profile?.emails[0]?.verified,
+            firstName: profile.name.familyName,
+            lastName: profile.name.givenName,
             avatar: profile?.photos[0]?.value,
-            role: "user",
-          });
-          await newUser.save();
-          return done(null, newUser);
-        } else {
-          // If user exists, update their Google sign-in information
-          user.googleId = profile.id;
-          user.displayName = profile.displayName;
-          user.avatar = profile?.photos[0]?.value;
-          user.isEmailVerify = profile?.emails[0]?.verified;
-          await User.updateOne({ _id: user._id }, { $set: user });
-          return done(null, user);
+            isEmailVerified: profile?.emails[0]?.verified,
+          };
+
+          // Only update if data has changed
+          await User.updateOne({ _id: user._id }, { $set: updates });
         }
+
+        return done(null, user);
       } catch (err) {
         return done(err);
       }
@@ -86,17 +97,12 @@ passport.use(
 
 // Serialize user to session
 passport.serializeUser((user, done) => {
-  done(null, user._id);
+  done(null, user);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
 module.exports = passport;

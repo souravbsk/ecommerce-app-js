@@ -5,6 +5,10 @@ const {
   loginUser,
   logoutUser,
   googleLoginCallback,
+  refreshTokens,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
 } = require("../../controllers/v1/auth.controller");
 const upload = require("multer")();
 const auth = express.Router();
@@ -15,27 +19,34 @@ const auth = express.Router();
 // User Registration & Login
 auth.post("/register", registerUser);
 auth.post("/login", loginUser);
+
+// Logout and Refresh Tokens
 auth.post("/logout", logoutUser);
+auth.post("/refresh-token", refreshTokens);
+
+
 
 // Google OAuth
-auth.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-auth.get(
-  "/google/callback",
-  passport.authenticate("google"),
-  googleLoginCallback
-);
+auth.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+auth.get("/google/callback", passport.authenticate("google"), googleLoginCallback);
 
-// Logout
 
-// // Check Authentication Status
+
+
+
+
 // auth.get("/checkAuth", verifyJwt, checkAuth);
 
-// // Password Management
-// auth.post("/forgot-password", forgotPassword);
-// auth.post("/reset-password", resetPassword);
+// Password Management
+auth.post("/forgot-password", forgotPassword);
+auth.post("/reset-password", resetPassword);
+
+
+
+
+// Email Verification
+auth.get("/verify-email", verifyEmail);
+
 
 // // OTP Routes for Registered Users
 // auth.post("/registered/get-otp", sendOtpToRegisteredUser);
