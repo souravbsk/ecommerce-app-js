@@ -7,6 +7,10 @@ const productSchema = new Schema(
       type: String,
       required: [true, "Product name is required"],
       trim: true,
+    },
+    slug: {
+      type: String,
+      required: [true, "Product slug is required"],
       unique: true,
     },
     description: {
@@ -39,11 +43,6 @@ const productSchema = new Schema(
       type: String,
       trim: true,
     },
-    price: {
-      type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price must be positive"],
-    },
     prices: [
       {
         basePrice: {
@@ -55,9 +54,10 @@ const productSchema = new Schema(
           type: Number,
           validate: {
             validator: function (v) {
-              return v < this.basePrice;
+              return v <= this.basePrice;
             },
-            message: "Sale price should be lower than the base price.",
+            message:
+              "Sale price should be lower than or equal to the base price.",
           },
         },
         currency: {
@@ -67,25 +67,27 @@ const productSchema = new Schema(
       },
     ],
     discount: {
-      type: {
-        amount: {
-          type: Number,
-          default: 0,
-        },
-        percentage: {
-          type: Number,
-          default: 0,
-        },
-        validTill: {
-          type: Date,
-        },
+      amount: {
+        type: Number,
+        default: 0,
       },
-      default: {},
+      percentage: {
+        type: Number,
+        default: 0,
+      },
+      validTill: Date,
     },
     stock: {
-      type: Number,
-      required: [true, "Stock quantity is required"],
-      min: [0, "Stock cannot be negative"],
+      quantity: {
+        type: Number,
+        required: [true, "Stock quantity is required"],
+        min: [0, "Stock cannot be negative"],
+      },
+      status: {
+        type: String,
+        enum: ["In-Stock", "Out-of-Stock", "Low-Stock"],
+        default: "In-Stock",
+      },
     },
     images: [
       {
@@ -93,10 +95,8 @@ const productSchema = new Schema(
           type: String,
           required: [true, "Image URL is required"],
         },
-        altText: {
-          type: String,
-          trim: true,
-        },
+        altText: { type: String, trim: true },
+        isPrimary: { type: Boolean, default: false },
       },
     ],
     variations: [
@@ -117,12 +117,14 @@ const productSchema = new Schema(
           type: Number,
           min: [0, "Stock cannot be negative"],
         },
+        imageUrl: {
+          type: String,
+        },
       },
     ],
     dimensions: {
       weight: {
         type: Number,
-        required: [true, "Product weight is required"],
         min: [0, "Weight must be positive"],
       },
       length: {
@@ -179,15 +181,14 @@ const productSchema = new Schema(
         },
       ],
     },
-    inventoryStatus: {
-      type: String,
-      enum: ["In Stock", "Out of Stock", "Low Stock"],
-      default: "In Stock",
-    },
     status: {
       type: String,
       enum: ["Active", "Inactive"],
       default: "Active",
+    },
+    isDelete: {
+      type: Boolean,
+      default: false,
     },
     shippingDetails: {
       weight: {
@@ -205,7 +206,7 @@ const productSchema = new Schema(
       },
       shippingClass: {
         type: String,
-        enum: ["Standard", "Express", "Next Day"],
+        enum: ["Standard", "Express", "Next-Day"],
         default: "Standard",
       },
     },

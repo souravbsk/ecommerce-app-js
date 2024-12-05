@@ -1,5 +1,8 @@
+const mongoose = require("mongoose");
+
 // SubCategory Schema
-const subCategorySchema = new Schema(
+
+const subCategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -18,8 +21,8 @@ const subCategorySchema = new Schema(
       type: String,
       trim: true,
     },
-    parentCategory: {
-      type: Schema.Types.ObjectId,
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
@@ -44,15 +47,14 @@ const subCategorySchema = new Schema(
   }
 );
 
-const SubCategory = model("SubCategory", subCategorySchema);
-export default SubCategory;
+// Update timestamp before saving or updating
+subCategorySchema.pre(["save", "findOneAndUpdate"], function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
 
-
-
-
-
-
-
+const SubCategory = mongoose.model("SubCategory", subCategorySchema);
+module.exports = SubCategory;
 
 // {
 //     "_id": "64b92e9a3dbb4c002b945b3e",
@@ -68,4 +70,3 @@ export default SubCategory;
 //     "createdAt": "2024-10-05T13:20:00.000Z",
 //     "updatedAt": "2024-10-15T11:00:00.000Z"
 //   }
-  

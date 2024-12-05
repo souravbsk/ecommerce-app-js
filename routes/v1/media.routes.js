@@ -1,7 +1,7 @@
 const express = require("express");
 const mediaRoutes = express.Router();
 
-const mediaController = require("../../controllers/v1/media.controller");
+const mediaController = require("../../controllers/v1/media.controllers.js");
 
 const { upload } = mediaController;
 

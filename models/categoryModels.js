@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
+
 // Category Schema
-const categorySchema = new Schema(
+const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -18,8 +20,8 @@ const categorySchema = new Schema(
       type: String,
       trim: true,
     },
-    parentCategory: {
-      type: Schema.Types.ObjectId,
+    parentCategoryId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "ParentCategory",
       required: true,
     },
@@ -44,17 +46,8 @@ const categorySchema = new Schema(
   }
 );
 
-const Category = model("Category", categorySchema);
-export default Category;
-
-
-
-
-
-
-
-
-
+const Category = mongoose.model("Category", categorySchema);
+module.exports = Category;
 
 // {
 //     "_id": "64b92e9a3dbb4c002b945b2d",
@@ -70,4 +63,3 @@ export default Category;
 //     "createdAt": "2024-10-02T11:30:00.000Z",
 //     "updatedAt": "2024-10-15T11:00:00.000Z"
 //   }
-  

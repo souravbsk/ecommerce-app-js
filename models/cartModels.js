@@ -1,33 +1,33 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 // Define the Cart Schema
 const cartSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true, // Reference to the user owning this cart
+      ref: "User",
+      required: true,
     },
     items: [
       {
         product: {
           type: Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true, // Reference to the product
+          ref: "Product",
+          required: true,
         },
         quantity: {
           type: Number,
           required: true,
-          min: 1, // Quantity must be at least 1
+          min: 1,
           default: 1,
         },
         price: {
           type: Number,
-          required: true, // Price of the product at the time it was added to the cart
+          required: true,
         },
         variant: {
           type: Schema.Types.ObjectId,
-          ref: 'ProductVariant',
+          ref: "ProductVariant",
         },
         total: {
           type: Number,
@@ -97,12 +97,12 @@ const cartSchema = new Schema(
     },
     currency: {
       type: String,
-      default: 'USD', // Currency for the cart, useful for international applications
+      default: "USD", // Currency for the cart, useful for international applications
     },
     status: {
       type: String,
-      enum: ['Pending', 'Ordered', 'Abandoned', 'Completed'],
-      default: 'Pending', // Status of the cart
+      enum: ["Pending", "Ordered", "Abandoned", "Completed"],
+      default: "Pending", // Status of the cart
     },
     createdAt: {
       type: Date,
@@ -118,17 +118,8 @@ const cartSchema = new Schema(
   }
 );
 
-const Cart = model('Cart', cartSchema);
+const Cart = model("Cart", cartSchema);
 export default Cart;
-
-
-
-
-
-
-
-
-
 
 // {
 //     "_id": "64c92e9a3dbb4c002b945b6a",
@@ -172,7 +163,5 @@ export default Cart;
 //     "createdAt": "2024-10-15T10:30:00.000Z",
 //     "updatedAt": "2024-10-20T12:00:00.000Z"
 //   }
-  
-
 
 // total = subTotal - discount.amount + tax.amount + shipping.cost

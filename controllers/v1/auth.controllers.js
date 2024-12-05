@@ -11,11 +11,6 @@ const {
   sendVerificationEmail,
 } = require("../../services/emailService.js");
 const crypto = require("crypto");
-// const passwordValidator = (value) => {
-//   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[A-Za-z\d]{8,}$/;
-//   return passwordRegex.test(value); // Returns true if password is valid
-// };
-
 const registerUser = async (req, res, next) => {
   try {
     const { email, password, firstName, lastName } = req.body;

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const config = require("./config");
 require("dotenv").config(); // Load environment variables from .env file
 
+
 const connectDB = async () => {
   try {
     const connection = await mongoose.connect(config.mongoUri, {

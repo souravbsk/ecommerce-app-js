@@ -1,13 +1,12 @@
-import { Schema, model } from "mongoose";
+const mongoose = require("mongoose"); // Use require
 
 // ParentCategory Schema
-const parentCategorySchema = new Schema(
+const parentCategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, "Parent category name is required"],
       trim: true,
-      unique: true,
     },
     slug: {
       type: String,
@@ -35,14 +34,21 @@ const parentCategorySchema = new Schema(
         trim: true,
       },
     },
+
   },
   {
     timestamps: true,
   }
 );
 
-const ParentCategory = model("ParentCategory", parentCategorySchema);
-export default ParentCategory;
+// Update timestamp before saving or updating
+parentCategorySchema.pre(["save", "findOneAndUpdate"], function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+const ParentCategory = mongoose.model("ParentCategory", parentCategorySchema);
+module.exports = ParentCategory; // Use module.exports
 
 // {
 //     "_id": "64b92e9a3dbb4c002b945b1f",

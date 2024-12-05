@@ -9,44 +9,40 @@ const {
   forgotPassword,
   resetPassword,
   verifyEmail,
-} = require("../../controllers/v1/auth.controller");
+} = require("../../controllers/v1/auth.controllers.js");
 const upload = require("multer")();
-const auth = express.Router();
+const authRouter = express.Router();
 
 // const { verifyJwt } = require("../middlewares/verifyJWT.js");
 // const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 
 // User Registration & Login
-auth.post("/register", registerUser);
-auth.post("/login", loginUser);
+authRouter.post("/register", registerUser);
+authRouter.post("/login", loginUser);
 
 // Logout and Refresh Tokens
-auth.post("/logout", logoutUser);
-auth.post("/refresh-token", refreshTokens);
-
-
+authRouter.post("/logout", logoutUser);
+authRouter.post("/refresh-token", refreshTokens);
 
 // Google OAuth
-auth.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-auth.get("/google/callback", passport.authenticate("google"), googleLoginCallback);
-
-
-
-
-
+authRouter.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+authRouter.get(
+  "/google/callback",
+  passport.authenticate("google"),
+  googleLoginCallback
+);
 
 // auth.get("/checkAuth", verifyJwt, checkAuth);
 
 // Password Management
-auth.post("/forgot-password", forgotPassword);
-auth.post("/reset-password", resetPassword);
-
-
-
+authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/reset-password", resetPassword);
 
 // Email Verification
-auth.get("/verify-email", verifyEmail);
-
+authRouter.get("/verify-email", verifyEmail);
 
 // // OTP Routes for Registered Users
 // auth.post("/registered/get-otp", sendOtpToRegisteredUser);
@@ -56,4 +52,4 @@ auth.get("/verify-email", verifyEmail);
 // auth.post("/get-otp", sendOtpToAnyUser);
 // auth.post("/verify-otp", veriyAnyOtp);
 
-module.exports = { auth };
+module.exports = { authRouter };
